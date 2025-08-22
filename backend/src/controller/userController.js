@@ -6,8 +6,8 @@ import asyncHandler from "../lib/asyncHandler.js";
 const createUser = asyncHandler(async (req, res) => {
   const { username, email, password, department, rollNumber } = req.body;
 
-  if (!username || !password || !email) {
-    throw new Error("Please find all the fields");
+  if (!username || !password || !email || !department || !rollNumber) {
+    throw new Error("Please fill all the fields");
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -90,7 +90,7 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
       email: user.email,
       rollNumber: user.rollNumber,
       department: user.department,
-      bio,
+      bio: null,
     });
   } else {
     res.status(404);

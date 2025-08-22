@@ -31,3 +31,5 @@ const session = mongoose.Schema(
     timestamps: true,
   }
 );
+
+export const Session = mongoose.model("Session", session);

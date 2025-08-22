@@ -13,8 +13,9 @@ const userSkillSchema = mongoose.Schema(
       required: true,
     },
     type: {
-      status: String,
+      type: String,
       enum: ["CAN_TEACH", "WANT_TO_LEARN"],
+      required: true,
     },
   },
   {
