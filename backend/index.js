@@ -4,6 +4,7 @@ import connectDB from "./src/lib/db.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import skillsRoute from "./src/routes/skillsRoute.js";
 import userSkillsRoute from "./src/routes/userSkillsRouter.js";
+import barterRoute from "./src/routes/barterRoutes.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(cookieParser());
 app.use("/api/users", userRoutes);
 app.use("/api/skills", skillsRoute);
 app.use("/api/userskills", userSkillsRoute);
+app.use("/api/barter", barterRoute);
 
 connectDB();
 

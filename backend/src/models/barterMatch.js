@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const barterMatchSchema = mongoose.Schema(
+const barterMatchSchema = new mongoose.Schema(
   {
     requestId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -12,11 +12,9 @@ const barterMatchSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-    matchedOn: Date.now(),
+    matchedOn: { type: Date, default: Date.now }, // ✅ fixed
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export const BarterMatch = mongoose.model("BarterMatch", barterMatchSchema);
