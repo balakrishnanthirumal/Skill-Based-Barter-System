@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const sessionSchema = new mongoose.Schema({
   scheduledTime: { type: Date, required: true },
-  durationMinutes: { type: Number, default: 60 }, // planned duration
+  durationMinutes: { type: Number, default: 60 },
   meetingLink: { type: String, required: true },
   hostUser: {
     type: mongoose.Schema.Types.ObjectId,
@@ -16,12 +16,14 @@ const sessionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["PENDING", "ONGOING", "COMPLETED", "CANCELLED"],
+    enum: ["PENDING", "CONFIRMED", "ONGOING", "COMPLETED", "CANCELLED"],
     default: "PENDING",
   },
-  startTime: { type: Date }, // 🕒 when session actually started
-  endTime: { type: Date }, // 🕓 when it ended
-  actualDurationMinutes: { type: Number, default: 0 }, // 🧮 real teaching time
+  hostAccepted: { type: Boolean, default: false },
+  guestAccepted: { type: Boolean, default: false },
+  startTime: { type: Date },
+  endTime: { type: Date },
+  actualDurationMinutes: { type: Number, default: 0 },
 });
 
 export const Session = mongoose.model("Session", sessionSchema);

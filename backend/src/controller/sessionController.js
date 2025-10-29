@@ -137,3 +137,63 @@ export const cancelSession = async (req, res) => {
     res.status(500).json({ message: "Error cancelling session", error });
   }
 };
+
+export const acceptSession = async (req, res) => {
+  try {
+    const { id } = req.params; // session ID
+    const userId = req.user._id;
+
+    const session = await Session.findById(id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    // Check which user is accepting
+    if (session.hostUser.toString() === userId.toString()) {
+      session.hostAccepted = true;
+    } else if (session.guestUser.toString() === userId.toString()) {
+      session.guestAccepted = true;
+    } else {
+      return res
+        .status(403)
+        .json({ message: "You are not part of this session" });
+    }
+
+    // If both accepted → confirm session
+    if (session.hostAccepted && session.guestAccepted) {
+      session.status = "CONFIRMED";
+    }
+
+    await session.save();
+    res.json({ message: "Session response updated", session });
+  } catch (error) {
+    console.error("Error accepting session:", error);
+    res.status(500).json({ message: "Error accepting session", error });
+  }
+};
+
+export const rejectSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const session = await Session.findById(id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    // Only participants can reject
+    if (
+      session.hostUser.toString() !== userId.toString() &&
+      session.guestUser.toString() !== userId.toString()
+    ) {
+      return res
+        .status(403)
+        .json({ message: "You are not part of this session" });
+    }
+
+    session.status = "CANCELLED";
+    await session.save();
+
+    res.json({ message: "Session rejected and cancelled", session });
+  } catch (error) {
+    console.error("Error rejecting session:", error);
+    res.status(500).json({ message: "Error rejecting session", error });
+  }
+};
