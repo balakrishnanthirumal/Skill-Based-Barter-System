@@ -3,6 +3,7 @@ import {
   createUser,
   getAllUsers,
   getCurrentUserProfile,
+  getDashboardData,
   loginUser,
   logoutCurrentUser,
   updateUserById,
@@ -20,5 +21,6 @@ router
   .route("/profile")
   .get(authenticate, getCurrentUserProfile)
   .put(authenticate, updateUserById);
+router.get("/data", authenticate, getDashboardData);
 
 export default router;

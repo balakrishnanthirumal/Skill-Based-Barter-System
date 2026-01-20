@@ -2,12 +2,12 @@ import express from "express";
 import {
   giveFeedback,
   getFeedbackForUser,
-} from "../controllers/feedbackController.js";
+} from "../controller/feedbackController.js";
 import { authenticate } from "../../middleware/authenticate.js";
 
 const router = express.Router();
 
 router.post("/", authenticate, giveFeedback);
-router.get("/:userId", authenticate, getFeedbackForUser);
+router.get("/", authenticate, getFeedbackForUser);
 
 export default router;

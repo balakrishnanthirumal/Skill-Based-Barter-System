@@ -5,7 +5,8 @@ import {
   startSession,
   endSession,
   cancelSession,
-} from "../controllers/sessionController.js";
+  updateSessionStatus,
+} from "../controller/sessionController.js";
 import { authenticate } from "../../middleware/authenticate.js";
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.put("/:id/start", authenticate, startSession);
 router.put("/:id/end", authenticate, endSession);
 
 router.put("/:id/cancel", authenticate, cancelSession);
+router.put("/:id/status", authenticate, updateSessionStatus);
 
 export default router;

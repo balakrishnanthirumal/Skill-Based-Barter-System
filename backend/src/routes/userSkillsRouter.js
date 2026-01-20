@@ -4,6 +4,7 @@ import {
   deleteUserSkill,
   getAllUserSkills,
   getUserSkills,
+  updateUserSkillsProfile,
 } from "../controller/userSkillController.js";
 import { authenticate } from "../../middleware/authenticate.js";
 
@@ -15,5 +16,6 @@ router
   .get(authenticate, getAllUserSkills);
 router.route("/user").get(authenticate, getUserSkills);
 router.route("/user/:id").delete(authenticate, deleteUserSkill);
+router.put("/profile", authenticate, updateUserSkillsProfile);
 
 export default router;

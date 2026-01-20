@@ -59,5 +59,51 @@ const deleteUserSkill = async (req, res) => {
     res.status(404).json({ message: "Skill is not found" });
   }
 };
+export const updateUserSkillsProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { teachSkills = [], learnSkills = [] } = req.body;
+
+    // ❌ Remove existing skills for user
+    await UserSkill.deleteMany({ userId });
+
+    const newSkills = [];
+
+    // ✅ Add CAN_TEACH skills
+    teachSkills.forEach((skillId) => {
+      newSkills.push({
+        userId,
+        skillsId: skillId,
+        type: "CAN_TEACH",
+      });
+    });
+
+    // ✅ Add WANT_TO_LEARN skills
+    learnSkills.forEach((skillId) => {
+      newSkills.push({
+        userId,
+        skillsId: skillId,
+        type: "WANT_TO_LEARN",
+      });
+    });
+
+    // Insert all at once
+    if (newSkills.length > 0) {
+      await UserSkill.insertMany(newSkills);
+    }
+
+    res.status(200).json({
+      message: "Profile skills updated successfully",
+      teachSkillsCount: teachSkills.length,
+      learnSkillsCount: learnSkills.length,
+    });
+  } catch (error) {
+    console.error("Update skills error:", error);
+    res.status(500).json({
+      message: "Failed to update user skills",
+      error,
+    });
+  }
+};
 
 export { getUserSkills, addUserSkill, getAllUserSkills, deleteUserSkill };

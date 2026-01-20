@@ -58,7 +58,7 @@ export const giveFeedback = async (req, res) => {
 // Get all feedback received by a user
 export const getFeedbackForUser = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user._id;
     const feedbacks = await FeedBack.find({ givenTo: userId })
       .populate("givenBy", "username department")
       .populate("sessionId", "scheduledTime durationMinutes status");

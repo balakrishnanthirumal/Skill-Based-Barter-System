@@ -28,15 +28,70 @@ export const createSession = async (req, res) => {
 export const getUserSessions = async (req, res) => {
   try {
     const userId = req.user._id;
+
+    // Fetch sessions where user is host or guest
     const sessions = await Session.find({
       $or: [{ hostUser: userId }, { guestUser: userId }],
     })
       .populate("hostUser", "username email rating")
       .populate("guestUser", "username email rating");
 
+    // Add skills for each user
+    const sessionsWithSkills = await Promise.all(
+      sessions.map(async (session) => {
+        // Fetch host skills
+        const hostSkills = await UserSkill.find({
+          userId: session.hostUser._id,
+        })
+          .populate("skillsId", "name")
+          .lean();
+
+        const hostCanTeach = hostSkills
+          .filter((s) => s.type === "CAN_TEACH")
+          .map((s) => s.skillsId);
+
+        const hostWantToLearn = hostSkills
+          .filter((s) => s.type === "WANT_TO_LEARN")
+          .map((s) => s.skillsId);
+
+        // Fetch guest skills
+        const guestSkills = await UserSkill.find({
+          userId: session.guestUser._id,
+        })
+          .populate("skillsId", "name")
+          .lean();
+
+        const guestCanTeach = guestSkills
+          .filter((s) => s.type === "CAN_TEACH")
+          .map((s) => s.skillsId);
+
+        const guestWantToLearn = guestSkills
+          .filter((s) => s.type === "WANT_TO_LEARN")
+          .map((s) => s.skillsId);
+
+        return {
+          ...session.toObject(),
+          hostUser: {
+            ...session.hostUser.toObject(),
+            skills: {
+              canTeach: hostCanTeach,
+              wantToLearn: hostWantToLearn,
+            },
+          },
+          guestUser: {
+            ...session.guestUser.toObject(),
+            skills: {
+              canTeach: guestCanTeach,
+              wantToLearn: guestWantToLearn,
+            },
+          },
+        };
+      })
+    );
+
     res.status(200).json({
       message: "Fetched user sessions successfully",
-      sessions,
+      sessions: sessionsWithSkills,
     });
   } catch (error) {
     console.error("Error fetching sessions:", error);
@@ -195,5 +250,23 @@ export const rejectSession = async (req, res) => {
   } catch (error) {
     console.error("Error rejecting session:", error);
     res.status(500).json({ message: "Error rejecting session", error });
+  }
+};
+
+export const updateSessionStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const session = await Session.findById(req.params.id);
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    session.status = status.toUpperCase();
+    await session.save();
+
+    res.json({ message: "Session status updated", session });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update session status" });
   }
 };

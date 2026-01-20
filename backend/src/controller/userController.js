@@ -2,6 +2,8 @@ import { User } from "../models/users.js";
 import bcrypt from "bcryptjs";
 import createToken from "../lib/createToken.js";
 import asyncHandler from "../lib/asyncHandler.js";
+import { Session } from "../models/session.js";
+import { BarterRequest } from "../models/barterRequest.js";
 
 const createUser = asyncHandler(async (req, res) => {
   const { username, email, password, department, rollNumber } = req.body;
@@ -49,28 +51,35 @@ const createUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+
+  // Find user by email
   const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
-
-    if (isPasswordValid) {
-      createToken(res, existingUser._id);
-
-      res.status(200).json({
-        _id: existingUser._id,
-        username: existingUser.username,
-        email: existingUser.email,
-        department: existingUser.department,
-        rollNumber: existingUser.rollNumber,
-        bio: existingUser.bio,
-      });
-      return;
-    }
+  if (!existingUser) {
+    res.status(401); // Unauthorized
+    throw new Error("Invalid email or password"); // 👈 explicit error
   }
+
+  // Compare password
+  const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+  if (!isPasswordValid) {
+    res.status(401); // Unauthorized
+    throw new Error("Invalid email or password"); // 👈 explicit error
+  }
+
+  // Password matches, create JWT token
+  createToken(res, existingUser._id);
+
+  res.status(200).json({
+    _id: existingUser._id,
+    username: existingUser.username,
+    email: existingUser.email,
+    department: existingUser.department,
+    rollNumber: existingUser.rollNumber,
+    bio: existingUser.bio,
+  });
 });
+
+export default loginUser;
 
 const logoutCurrentUser = asyncHandler(async (req, res) => {
   res.cookie("jwt", "", {
@@ -137,6 +146,48 @@ const updateUserById = asyncHandler(async (req, res) => {
   }
 });
 
+const getDashboardData = async (req, res) => {
+  try {
+    const userId = req.user;
+    console.log(req.user);
+
+    // Sessions where user is involved
+    const userSessionFilter = {
+      $or: [{ hostUser: userId }, { guestUser: userId }],
+    };
+
+    const completedSessionsCount = await Session.countDocuments({
+      ...userSessionFilter,
+      status: "COMPLETED",
+    });
+
+    const cancelledSessionsCount = await Session.countDocuments({
+      ...userSessionFilter,
+      status: "CANCELLED",
+    });
+
+    const pendingSessionsCount = await Session.countDocuments({
+      ...userSessionFilter,
+      status: { $in: ["PENDING", "CONFIRMED", "ONGOING"] },
+    });
+
+    const unmatchedRequestsCount = await BarterRequest.countDocuments({
+      userId,
+      status: "OPEN",
+    });
+
+    res.json({
+      completedSessionsCount,
+      cancelledSessionsCount,
+      pendingSessionsCount,
+      unmatchedRequestsCount,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch dashboard data" });
+  }
+};
+
 export {
   createUser,
   loginUser,
@@ -145,4 +196,5 @@ export {
   getUserById,
   updateUserById,
   getAllUsers,
+  getDashboardData,
 };
