@@ -14,6 +14,7 @@ const sessionSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+
   status: {
     type: String,
     enum: ["PENDING", "CONFIRMED", "ONGOING", "COMPLETED", "CANCELLED"],
