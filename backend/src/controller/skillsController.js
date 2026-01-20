@@ -1,4 +1,4 @@
-import { Skill } from "../models/skills.js";
+import { Skill } from "../models/Skills.js";
 import Fuse from "fuse.js";
 
 // Create Skill
