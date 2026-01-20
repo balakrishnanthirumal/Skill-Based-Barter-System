@@ -1,6 +1,6 @@
-import { FeedBack } from "../models/feedback.js";
-import { User } from "../models/users.js";
-import { Session } from "../models/session.js";
+import { FeedBack } from "../models/Feedback.js";
+import { User } from "../models/Users.js";
+import { Session } from "../models/Session.js";
 
 // Give feedback after a completed session
 export const giveFeedback = async (req, res) => {

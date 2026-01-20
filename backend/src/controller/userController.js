@@ -1,9 +1,9 @@
-import { User } from "../models/users.js";
+import { User } from "../models/Users.js";
 import bcrypt from "bcryptjs";
 import createToken from "../lib/createToken.js";
 import asyncHandler from "../lib/asyncHandler.js";
-import { Session } from "../models/session.js";
-import { BarterRequest } from "../models/barterRequest.js";
+import { Session } from "../models/Session.js";
+import { BarterRequest } from "../models/BarterRequest.js";
 
 const createUser = asyncHandler(async (req, res) => {
   const { username, email, password, department, rollNumber } = req.body;

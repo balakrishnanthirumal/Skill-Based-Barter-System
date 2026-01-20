@@ -1,6 +1,6 @@
-import { BarterRequest } from "../models/barterRequest.js";
-import { Session } from "../models/session.js";
-import { UserSkill } from "../models/userSkills.js";
+import { BarterRequest } from "../models/BarterRequest.js";
+import { Session } from "../models/Session.js";
+import { UserSkill } from "../models/UserSkills.js";
 
 export const createSession = async (req, res) => {
   try {
@@ -86,7 +86,7 @@ export const getUserSessions = async (req, res) => {
             },
           },
         };
-      })
+      }),
     );
 
     res.status(200).json({
@@ -106,7 +106,7 @@ export const startSession = async (req, res) => {
     const session = await Session.findByIdAndUpdate(
       id,
       { status: "ONGOING", startTime: new Date() },
-      { new: true }
+      { new: true },
     );
 
     if (!session) return res.status(404).json({ message: "Session not found" });
@@ -130,7 +130,7 @@ export const endSession = async (req, res) => {
 
     const endTime = new Date();
     const durationMinutes = Math.round(
-      (endTime - new Date(session.startTime)) / 60000
+      (endTime - new Date(session.startTime)) / 60000,
     );
 
     session.status = "COMPLETED";
@@ -179,7 +179,7 @@ export const cancelSession = async (req, res) => {
     const session = await Session.findByIdAndUpdate(
       id,
       { status: "CANCELLED" },
-      { new: true }
+      { new: true },
     );
     if (!session) return res.status(404).json({ message: "Session not found" });
 

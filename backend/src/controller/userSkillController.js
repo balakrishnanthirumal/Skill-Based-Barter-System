@@ -1,4 +1,4 @@
-import { UserSkill } from "../models/userSkills.js";
+import { UserSkill } from "../models/UserSkills.js";
 
 const addUserSkill = async (req, res) => {
   try {
@@ -30,7 +30,7 @@ const addUserSkill = async (req, res) => {
 const getUserSkills = async (req, res) => {
   try {
     const skills = await UserSkill.find({ userId: req.user._id }).populate(
-      "skillsId"
+      "skillsId",
     );
     res.status(200).json(skills);
   } catch (error) {

@@ -1,8 +1,8 @@
-import { BarterRequest } from "../models/barterRequest.js";
-import { BarterMatch } from "../models/barterMatch.js";
-import { UserSkill } from "../models/userSkills.js";
-import { Session } from "../models/session.js";
-import { User } from "../models/users.js";
+import { BarterRequest } from "../models/BarterRequest.js";
+import { BarterMatch } from "../models/BarterMatch.js";
+import { UserSkill } from "../models/UserSkills.js";
+import { Session } from "../models/Session.js";
+import { User } from "../models/Users.js";
 
 // ✅ Helper: Generate unique Jitsi link
 function generateJitsiLink(sessionId) {
