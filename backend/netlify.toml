@@ -1,0 +1,7 @@
+[build]
+  base = "backend"
+  command = "npm install"
+  publish = "backend"
+
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "PORT"
